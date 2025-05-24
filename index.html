@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Map Publisher</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+    }
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    #sidebar {
+      width: 250px;
+      background: #f4f4f4;
+      padding: 1rem;
+      overflow-y: auto;
+      height: 100vh;
+    }
+    #map-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    #map {
+      flex: 1;
+      width: 100%;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 0.5rem;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem;
+      width: 100%;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .distance-btn {
+      background-color: #2980b9;
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <h2>Points of Interest</h2>
+    <ul>
+      <li>
+        <a href="#" onclick="flyToLocation(-6.592906715566611, 106.79468365214332)">Kelurahan Pabaton(Selasa 20 Mei)</a>
+        <button class="distance-btn" onclick="queryDistance(-6.592906715566611, 106.79468365214332, 'Kelurahan Pabaton')">Distance to Kelurahan Pabaton</button>
+      </li>
+      <li>
+        <a href="#" onclick="flyToLocation(-6.597721468907287, 106.79294852033048)">Kelurahan Paledang (Kamis 22 Mei)</a>
+        <button class="distance-btn" onclick="queryDistance(-6.597721468907287, 106.79294852033048, 'Kelurahan Paledang')">Distance to Kelurahan Paledang</button>
+      </li>
+      <li>
+        <a href="#" onclick="flyToLocation(-6.581729156573341, 106.79475976821598)">Kelurahan Cibogor (Jumat 23 Mei)</a>
+        <button class="distance-btn" onclick="queryDistance(-6.581729156573341, 106.79475976821598, 'Kelurahan Cibogor')">Distance to Kelurahan Cibogor</button>
+      </li>
+    </ul>
+    <button onclick="locateUser()">Go to My Location</button>
+  </div>
+  <div id="map-container">
+    <header>
+      <h1>My Published Map</h1>
+    </header>
+    <div id="map"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([-6.597721468907287, 106.79294852033048], 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const markers = [
+      { coords: [-6.592906715566611, 106.79468365214332], popup: 'Kelurahan Pabaton<br>Jadwal: Selasa 20 Mei' },
+      { coords: [-6.597721468907287, 106.79294852033048], popup: 'Kelurahan Paledang<br>Jadwal: Kamis 22 Mei' },
+      { coords: [-6.581729156573341, 106.79475976821598], popup: 'Kelurahan Cibogor<br>Jadwal: Jumat 23 Mei' }
+    ];
+
+    markers.forEach(({ coords, popup }) => {
+      L.marker(coords).addTo(map).bindPopup(popup);
+    });
+
+    function flyToLocation(lat, lng) {
+      map.flyTo([lat, lng], 12);
+    }
+
+    function locateUser() {
+      map.locate({ setView: true, maxZoom: 12 });
+    }
+
+    map.on('locationfound', function (e) {
+      L.marker(e.latlng).addTo(map)
+        .bindPopup('You are here').openPopup();
+      userLocation = e.latlng;
+    });
+
+    map.on('locationerror', function () {
+      alert('Unable to retrieve your location');
+    });
+
+    let userLocation = null;
+    let distanceLines = [];
+
+    function queryDistance(lat, lng, cityName) {
+      if (!userLocation) {
+        map.locate();
+        alert('Locating user... Please try again in a moment.');
+        return;
+      }
+
+      // Remove previous lines
+      distanceLines.forEach(line => map.removeLayer(line));
+      distanceLines = [];
+
+      const userLatLng = L.latLng(userLocation.lat, userLocation.lng);
+      const cityLatLng = L.latLng(lat, lng);
+      const distance = userLatLng.distanceTo(cityLatLng) / 1000; // meters to km
+
+      const line = L.polyline([userLatLng, cityLatLng], { color: 'red' }).addTo(map);
+      distanceLines.push(line);
+
+      const midLat = (userLatLng.lat + cityLatLng.lat) / 2;
+      const midLng = (userLatLng.lng + cityLatLng.lng) / 2;
+
+      const label = L.marker([midLat, midLng], {
+        icon: L.divIcon({
+          className: 'distance-label',
+          html: `<div style="background:white;padding:2px 6px;border:1px solid #ccc;border-radius:4px;">${distance.toFixed(2)} km to ${cityName}</div>`
+        })
+      }).addTo(map);
+      distanceLines.push(label);
+    }
+  </script>
+</body>
+</html>
