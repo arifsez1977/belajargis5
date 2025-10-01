@@ -70,6 +70,10 @@
       <li>
         <a href="#" onclick="flyToLocation(-6.581729156573341, 106.79475976821598)">Kelurahan Cibogor (Jumat 23 Mei)</a>
         <button class="distance-btn" onclick="queryDistance(-6.581729156573341, 106.79475976821598, 'Kelurahan Cibogor')">Distance to Kelurahan Cibogor</button>
+        </li>
+      <li>
+        <a href="#" onclick="flyToLocation(-6.58249, 106.80030)">Kelurahan Bantarjati (Rabu 8 Oktober)</a>
+        <button class="distance-btn" onclick="queryDistance(-6.58249, 106.80030, 'Kelurahan Bantarjati')">Distance to Kelurahan Bantarjati</button>
       </li>
     </ul>
     <button onclick="locateUser()">Go to My Location</button>
@@ -92,7 +96,8 @@
     const markers = [
       { coords: [-6.592906715566611, 106.79468365214332], popup: 'Kelurahan Pabaton<br>Jadwal: Selasa 20 Mei' },
       { coords: [-6.597721468907287, 106.79294852033048], popup: 'Kelurahan Paledang<br>Jadwal: Kamis 22 Mei' },
-      { coords: [-6.581729156573341, 106.79475976821598], popup: 'Kelurahan Cibogor<br>Jadwal: Jumat 23 Mei' }
+      { coords: [-6.581729156573341, 106.79475976821598], popup: 'Kelurahan Cibogor<br>Jadwal: Jumat 23 Mei' },
+      { coords: [-6.58249, 106.80030], popup: 'Kelurahan Bantarjati<br>Jadwal: Rabu 8 Oktober' },
     ];
 
     markers.forEach(({ coords, popup }) => {
@@ -152,3 +157,4 @@
   </script>
 </body>
 </html>
+
